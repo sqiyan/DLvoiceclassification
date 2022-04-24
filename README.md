@@ -109,3 +109,5 @@ After training, run your model against the test set. You will be able to see the
 ```
 trainer.test(model, test_loader)
 ```
+
+Credits to Toh Kai Feng, Yap Swee En, Chua Qi Bao, Seah Qi Yan, Lo Jun Kai
