@@ -117,4 +117,6 @@ After training, run your model against the test set. You will be able to see the
 trainer.test(model, test_loader)
 ```
 
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sqiyan/DLvoiceclassification/HEAD?labpath=Project_Code_for_GUI.ipynb)
+
 Credits to Toh Kai Feng, Yap Swee En, Chua Qi Bao, Seah Qi Yan, Lo Jun Kai
