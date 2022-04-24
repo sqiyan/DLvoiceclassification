@@ -33,8 +33,8 @@ Here we can see that both the training and validation accuracy achieving 35% acc
 Connect your runtime to GPU. Avoid running the training for too many epochs as you might hit the Colab usage limits.
 
 ## Downloading the Audio Dataset
-1. Open ProjectCode_Riley from https://drive.google.com/drive/folders/196KRvyUlmY05-hxnRYhLqB8B34eCLUel?usp=sharing.
-2. Add shortcut link from this folder to a folder in your local Drive
+1. Open **ProjectCode_Riley**
+2. Add shortcut link from https://drive.google.com/drive/folders/196KRvyUlmY05-hxnRYhLqB8B34eCLUel?usp=sharing to a folder in your local Drive
 3. Add the path of your local Drive folder to the code below
 ```
 # Change this your path to the gdrive
