@@ -1,4 +1,7 @@
-# Introduction
+# DL Voice Classification
+> This project contains the code for our Deep Learning project on age classifcation from voice input.
+
+## Introduction
 
 Being able to extract certain background information about the users, such as their age, can be useful in numerous ways including user-profiling and personalised call-routing. With this knowledge, one possible application of speech recognition age classifiers is a recommendation system that can return an age-relevant result when asked for a movie recommendation. This enhances the quality of recommendation since a popular movie for the general audience could be an irrelevant movie to a child requesting for a children’s show with a similar title
 
@@ -29,58 +32,60 @@ For the first convolutional layer, a **kernel size of 3x3 and stride 2** was use
 Here we can see that both the training and validation accuracy achieving 35% accuracy
 ![CNN Results ](images/CNN_Results.png)
 
-# How to Run the RNN/Bidirectional GRU Code
-Connect your runtime to GPU. Avoid running the training for too many epochs as you might hit the Colab usage limits.
+## How to train the models
 
-## Downloading the Audio Dataset
-1. Open **ProjectCode_Riley**
-2. Add shortcut link from https://drive.google.com/drive/folders/196KRvyUlmY05-hxnRYhLqB8B34eCLUel?usp=sharing to a folder in your local Drive
-3. Add the path of your local Drive folder to the code below
-```
-# Change this your path to the gdrive
-pwd = "/content/drive/MyDrive/Deep Learning/"
-```
-4. Run the next block of code  
-```
-!wget "https://drive.google.com/uc?id=1MKzu-TfLKEygWOK5FpbVBsI8sKeB48DC&confirm=t"
-!mv "uc?id=1MKzu-TfLKEygWOK5FpbVBsI8sKeB48DC&confirm=t" root_audio_dir.zip
-!wget "https://drive.google.com/uc?export=download&id=1v0zhoVKLCSudS4XJFJHR3GWN28B5zdBB"
-!mv "uc?export=download&id=1v0zhoVKLCSudS4XJFJHR3GWN28B5zdBB" formatted.csv
-csv_file_path = "formatted.csv"
-root_audio_dir = "root_audio_dir/"
-```
-5. Unzip and remove the zip file 
-```
-!unzip -q root_audio_dir.zip
-!rm root_audio_dir.zip
-!du -sh ./*
-```
+1. Upload the jupyter notebook you want to run to your Google drive.
 
+2. Add the path of the folder containing the notebook to the code below.
+    ```
+    # Change this your path to the gdrive
+    pwd = "/content/drive/MyDrive/Deep Learning/"
+    ```
+3. Connect to a GPU runtime and run the next block of code to download the dataset.
+    ```
+    !wget "https://drive.google.com/uc?id=1MKzu-TfLKEygWOK5FpbVBsI8sKeB48DC&confirm=t"
+    !mv "uc?id=1MKzu-TfLKEygWOK5FpbVBsI8sKeB48DC&confirm=t" root_audio_dir.zip
+    !wget "https://drive.google.com/uc?export=download&id=1v0zhoVKLCSudS4XJFJHR3GWN28B5zdBB"
+    !mv "uc?export=download&id=1v0zhoVKLCSudS4XJFJHR3GWN28B5zdBB" formatted.csv
+    csv_file_path = "formatted.csv"
+    root_audio_dir = "root_audio_dir/"
+    ```
+    Alternatively, if the above fails, proceed to our [google drive folder](https://drive.google.com/drive/folders/196KRvyUlmY05-hxnRYhLqB8B34eCLUel?usp=sharing) and transfer the `root_audio_dir.zip` file to the same directory of the notebook.
+    
+4. Unzip and remove the zip file.
+    ```
+    !unzip -q root_audio_dir.zip
+    !rm root_audio_dir.zip
+    !du -sh ./*
+    ```
+    
+5. Run the remainder code cells.
 
-## Running RNN or Bidirectional GRU
+### For ProjectCode_Riley.ipynb only
+
 1. Run the code all the way till the **Define RNN/Bidirectional GRU** section. 
 2. Specify the model you want to train 
-```
-# If you want to use RNN, specify "RNN" instead of "BiGRU"
-model_name = "BiGRU"
+    ```
+    # If you want to use RNN, specify "RNN" instead of "BiGRU"
+    model_name = "BiGRU"
+    ```
 
-if model_name == "BiGRU":
-    model_name = time.strftime("%m-%d_%H-%M-%S", time.gmtime())
-    model = LightningModel(BidirectionalGRU(), learning_rate=learning_rate, loss_function=loss_function, optimizer=optimizer)
-    model.to(device)
-elif model_name == "RNN":
-    model_name = time.strftime("%m-%d_%H-%M-%S", time.gmtime())
-    model = LightningModel(RNNModel(), learning_rate=learning_rate, loss_function=loss_function, optimizer=optimizer)
-    model.to(device)
-else:
-    # Load state dict from the disk (make sure it is the same name as above)
-    state_dict = torch.load(pwd + model_name)
-    # Create a new model and load the state
-    model = LightningModel(BidirectionalGRU(), learning_rate=learning_rate, loss_function=loss_function, optimizer=optimizer)
-    model.load_state_dict(state_dict, strict=False)
+## Training Features
+
+### Callbacks
+
+- Early stopping
+- Model checkpoints
+
+Early stopping is implemented so that we can stop training before the model starts to overfit. Meanwhile model checkpoint is needed as the runtime that Colaboratory provides is unreliable, hence we would want to save our model periodically so that we can restore training from the previous checkpoint.
+
+```
+earlystopping_cb = EarlyStopping(monitor="val_loss", mode="min", patience=4)
+modelckpt_cb = ModelCheckpoint(monitor="val_loss", dirpath=model_save_path, filename=model_name+"_{epoch}_{val_loss:.2f}")
 ```
 
-## Tensorboard
+### Tensorboard
+
 You can use the tensorboard to track the performance of the model while training. The tensorboard will show the validation performance of your model at every epoch.
 ```
 # Launch tensorboard
@@ -88,7 +93,8 @@ You can use the tensorboard to track the performance of the model while training
 %tensorboard --logdir=lightning_logs/
 ```
 
-## Training 
+### Pytorch Lightning Training 
+
 To train the model, run this block of code. For every epoch, a validation will be performed on the model. You can refresh the tensorboard to see the validation results and find out how your model is performing. 
 ```
 trainer = pl.Trainer(gpus=1, callbacks=callbacks, max_epochs=epochs, check_val_every_n_epoch=1)
@@ -96,15 +102,16 @@ trainer.fit(model, train_loader, val_loader)
 ```
 Avoid running the training for too many epochs as you might hit the Colab usage limits.
 
+### Saving your Model
 
-## Saving your Model
 Run this block of code to save your model as a `.pth` file
 ```
 # Manual saving
 torch.save(model.model.state_dict(), "testing_model.pth")  # Can replace with model_name
 ```
 
-## Testing 
+### Testing 
+
 After training, run your model against the test set. You will be able to see the accuracy and loss of your model once it's done.
 ```
 trainer.test(model, test_loader)
