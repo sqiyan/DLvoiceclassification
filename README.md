@@ -20,4 +20,17 @@ Run the code all the way till this block.
 <img width="1185" alt="Screenshot 2022-04-25 at 12 09 37 AM" src="https://user-images.githubusercontent.com/62118373/164985559-cf014e1e-fb7d-4b61-b2f1-f4189133037c.png">
 If you want to run the RNN model, you have to change `line 8` from `BidrectionalGRU()` to `RNNModel()` Otherwise, you want to run the Bidirectional GRU model, you don't have to change anything
 
+## Training 
+To train the model, run this block of code. For every epoch, a validation will be performed on the model. You can refresh the tensorboard to see the validation results and find out how your model is performing. Avoid running the training for too many epochs as you might hit the Colab usage limits.
+<img width="943" alt="Screenshot 2022-04-25 at 12 17 20 AM" src="https://user-images.githubusercontent.com/62118373/164985894-3dc184b0-6526-4285-939f-568476177314.png">
+
+## Saving your Model
+Run this block of code to save your model as a `.pth` file
+<img width="810" alt="Screenshot 2022-04-25 at 12 19 38 AM" src="https://user-images.githubusercontent.com/62118373/164986005-dce39a6d-3418-4eb8-8e40-f978849046fd.png">
+
+## Testing 
+After training, run your model against the test set. You will be able to see the accuracy and loss of your model once it's done.
+<img width="600" alt="Screenshot 2022-04-25 at 12 20 17 AM" src="https://user-images.githubusercontent.com/62118373/164986030-aebc96a3-d2b2-4e64-aac8-597defce8a65.png">
+
+
 
