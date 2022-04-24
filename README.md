@@ -29,38 +29,83 @@ For the first convolutional layer, a **kernel size of 3x3 and stride 2** was use
 Here we can see that both the training and validation accuracy achieving 35% accuracy
 ![CNN Results ](images/CNN_Results.png)
 
-# How to Run the Code
-
+# How to Run the RNN/Bidirectional GRU Code
 Connect your runtime to GPU. Avoid running the training for too many epochs as you might hit the Colab usage limits.
 
 ## Downloading the Audio Dataset
-
 1. Open ProjectCode_Riley from https://drive.google.com/drive/folders/196KRvyUlmY05-hxnRYhLqB8B34eCLUel?usp=sharing.
 2. Add shortcut link from this folder to a folder in your local Drive
-3. Add the path of your local Drive folder to the code and update line 15
-   <img width="1202" alt="Screenshot 2022-04-24 at 11 58 47 PM" src="https://user-images.githubusercontent.com/62118373/164985161-861b6531-4e80-4130-b9de-88f788f76bb6.png">
+3. Add the path of your local Drive folder to the code below
+```
+# Change this your path to the gdrive
+pwd = "/content/drive/MyDrive/Deep Learning/"
+```
 4. Run the next block of code  
-   <img width="787" alt="Screenshot 2022-04-25 at 12 02 19 AM" src="https://user-images.githubusercontent.com/62118373/164985291-8511acf1-0d0d-41d0-99d6-479cd796ccf0.png">
-5. Unzip and remove the zip file
-   <img width="413" alt="Screenshot 2022-04-25 at 12 01 28 AM" src="https://user-images.githubusercontent.com/62118373/164985250-600ec8ec-0c9d-475e-a44f-504b30505cf8.png">
+```
+!wget "https://drive.google.com/uc?id=1MKzu-TfLKEygWOK5FpbVBsI8sKeB48DC&confirm=t"
+!mv "uc?id=1MKzu-TfLKEygWOK5FpbVBsI8sKeB48DC&confirm=t" root_audio_dir.zip
+!wget "https://drive.google.com/uc?export=download&id=1v0zhoVKLCSudS4XJFJHR3GWN28B5zdBB"
+!mv "uc?export=download&id=1v0zhoVKLCSudS4XJFJHR3GWN28B5zdBB" formatted.csv
+csv_file_path = "formatted.csv"
+root_audio_dir = "root_audio_dir/"
+```
+5. Unzip and remove the zip file 
+```
+!unzip -q root_audio_dir.zip
+!rm root_audio_dir.zip
+!du -sh ./*
+```
 
-## Running RNN and Bidirectional GRU Code
 
-Run the code all the way till this block.
-<img width="1185" alt="Screenshot 2022-04-25 at 12 09 37 AM" src="https://user-images.githubusercontent.com/62118373/164985559-cf014e1e-fb7d-4b61-b2f1-f4189133037c.png">
-If you want to run the RNN model, you have to change `line 8` from `BidrectionalGRU()` to `RNNModel()` Otherwise, you want to run the Bidirectional GRU model, you don't have to change anything
+## Running RNN or Bidirectional GRU
+1. Run the code all the way till the **Define RNN/Bidirectional GRU** section. 
+2. Specify the model you want to train 
+```
+# If you want to use RNN, specify "RNN" instead of "BiGRU"
+model_name = "BiGRU"
 
-## Training
+if model_name == "BiGRU":
+    model_name = time.strftime("%m-%d_%H-%M-%S", time.gmtime())
+    model = LightningModel(BidirectionalGRU(), learning_rate=learning_rate, loss_function=loss_function, optimizer=optimizer)
+    model.to(device)
+elif model_name == "RNN":
+    model_name = time.strftime("%m-%d_%H-%M-%S", time.gmtime())
+    model = LightningModel(RNNModel(), learning_rate=learning_rate, loss_function=loss_function, optimizer=optimizer)
+    model.to(device)
+else:
+    # Load state dict from the disk (make sure it is the same name as above)
+    state_dict = torch.load(pwd + model_name)
+    # Create a new model and load the state
+    model = LightningModel(BidirectionalGRU(), learning_rate=learning_rate, loss_function=loss_function, optimizer=optimizer)
+    model.load_state_dict(state_dict, strict=False)
+```
 
-To train the model, run this block of code. For every epoch, a validation will be performed on the model. You can refresh the tensorboard to see the validation results and find out how your model is performing. Avoid running the training for too many epochs as you might hit the Colab usage limits.
-<img width="943" alt="Screenshot 2022-04-25 at 12 17 20 AM" src="https://user-images.githubusercontent.com/62118373/164985894-3dc184b0-6526-4285-939f-568476177314.png">
+## Tensorboard
+You can use the tensorboard to track the performance of the model while training. The tensorboard will show the validation performance of your model at every epoch.
+```
+# Launch tensorboard
+%reload_ext tensorboard
+%tensorboard --logdir=lightning_logs/
+```
+
+## Training 
+To train the model, run this block of code. For every epoch, a validation will be performed on the model. You can refresh the tensorboard to see the validation results and find out how your model is performing. 
+```
+trainer = pl.Trainer(gpus=1, callbacks=callbacks, max_epochs=epochs, check_val_every_n_epoch=1)
+trainer.fit(model, train_loader, val_loader)
+```
+Avoid running the training for too many epochs as you might hit the Colab usage limits.
+
 
 ## Saving your Model
-
 Run this block of code to save your model as a `.pth` file
-<img width="810" alt="Screenshot 2022-04-25 at 12 19 38 AM" src="https://user-images.githubusercontent.com/62118373/164986005-dce39a6d-3418-4eb8-8e40-f978849046fd.png">
+```
+# Manual saving
+torch.save(model.model.state_dict(), "testing_model.pth")  # Can replace with model_name
+```
 
-## Testing
-
+## Testing 
 After training, run your model against the test set. You will be able to see the accuracy and loss of your model once it's done.
-<img width="600" alt="Screenshot 2022-04-25 at 12 20 17 AM" src="https://user-images.githubusercontent.com/62118373/164986030-aebc96a3-d2b2-4e64-aac8-597defce8a65.png">
+```
+trainer.test(model, test_loader)
+```
