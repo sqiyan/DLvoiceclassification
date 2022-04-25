@@ -127,6 +127,15 @@ To do this, access our GUI by clicking on the Binder badge below:
 
 Note that our model accuracy is about 35%.. so don't be too offended by a wrong classification!
 
+### How it works
+
+1. We load our model file from the repository into a PyTorch model that has been defined with the same architecture
+2. We initialise an audio recorder widget to record your audio via your device's microphone input
+3. The audio input is then converted to a .wav file and passed into our model for prediction
+
+Also, should the Jupyter Notebook on Binder have issues with displaying our audio recorder widget, here is what it is supposed to look like:
+
+![image](https://user-images.githubusercontent.com/60425964/165049661-50b6d022-e4fb-4711-8735-5c5286e4e18f.png)
 
 #
 Credits to Toh Kai Feng, Yap Swee En, Chua Qi Bao, Seah Qi Yan, Lo Jun Kai
