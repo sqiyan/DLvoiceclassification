@@ -117,6 +117,15 @@ After training, run your model against the test set. You will be able to see the
 trainer.test(model, test_loader)
 ```
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sqiyan/DLvoiceclassification/HEAD?labpath=Project_Code_for_GUI.ipynb)
+## Getting Model Predictions through our GUI
+
+You can also let our trained CNN model guess your age from your voice! 
+
+To do this, access our GUI by clicking on the Binder badge below:
+
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/sqiyan/DLvoiceclassification/HEAD?filepath=Project_Code_for_GUI.ipynb)
+
+Note that our model accuracy is about 35%.. so don't be too offended by a wrong classification!
+
 
 Credits to Toh Kai Feng, Yap Swee En, Chua Qi Bao, Seah Qi Yan, Lo Jun Kai
